@@ -2,40 +2,70 @@ const express = require('express');
 const api = require('./apiHandler');
 
 const app = express();
-const port = 3000;
+const port = 8080;
 
 app.use(express.json());
 app.use(express.static(`${__dirname}/../client/dist`));
 
 const endPoints = {
-  endPoint1: '',
-  endPoint2: '',
-  endPoint3: '',
+  fetchQandA: '/qa/questions/product_id=:id',
+  fetchAsForQ: '/qa/questions/:id/answers',
+  addQuestion: '/qa/questions',
+  addAnswer: '/qa/questions/:id/answers',
+  upvoteQuestions: '/qa/questions/:id/helpful',
+  upvoteAnswers: '/qa/answers/:id/helpful',
+  reportQuestion: '/qa/questions/:id/report',
 }
 
-app.get(endPoints.endPoint1, (req, res) => {
+app.get(endPoints.fetchQandA, (req, res) => {
   const { id } = req.params;
-  api.fetch(id, (details) => {
-    res.send(details.data);
+  api.fetchQandA(id, (data) => {
+    res.status(200).send(data)
+  })
+});
+
+app.get(endPoints.fetchAsForQ, (req, res) => {
+  const { id } = req.params;
+  api.fetchAsForQ(id, (data) => {
+    res.status(200).send(data)
+  })
+});
+
+app.post(endPoints.addQuestion, (req, res) => {
+  const content = req.body;
+  api.addQuestion(content, () => {
+    res.status(204).send()
+  })
+});
+
+app.post(endPoints.addAnswer, (req, res) => {
+  const question_id = req.params.id;
+  const content = req.body;
+  api.addAnswer(question_id, content, () => {
+    res.status(204).send()
   });
 });
 
-app.post(endPoints.endPoint2, (req, res) => {
-  const {
-    param1,
-    param2,
-  } = req.body;
-  api.post(param1, param2, () => {
-    res.end();
+app.put(endPoints.upvoteQuestions, (req, res) => {
+  const { id } = req.params;
+  api.upvoteQuestions(id, () => {
+    res.status(204).send('question_upvoted');
   });
 });
 
-app.put(endPoints.endPoint3, (req, res) => {
-  const { param1 } = req.params;
-  api.put(param1, (newData) => {
-    res.status(200).send(newData.data);
+app.put(endPoints.upvoteAnswers, (req, res) => {
+  const { id } = req.params;
+  api.upvoteAnswers(id, () => {
+    res.status(204).send('answer_upvoted');
   });
 });
+
+app.put(endPoints.reportQuestion, (req, res) => {
+  const { id } = req.params;
+  api.reportQuestion(id, () => {
+    res.status(204).send('question_reported');
+  })
+})
 
 app.listen(port, () => {
   console.log(`server is listening on port ${port}`);
