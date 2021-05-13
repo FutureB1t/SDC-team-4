@@ -6,7 +6,7 @@ const client = new Client({
   database: 'superb_api',
   password: '',
   port: 5432,
-})
+});
 client.connect();
 
 // client.query('SELECT NOW()', (err, res) => {

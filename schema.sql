@@ -103,3 +103,7 @@ INSERT INTO Answers (question_id,answer_id,body,date,answerer_name,answerer_emai
 (-1017,-6969,'hey this is an answer',1599958385988,'johnnyB','jb@email.com',0,5);
 INSERT INTO Photos (answer_id,photo_id,url) VALUES
 (-6969,-1337,'radical_photo_url');
+
+SELECT setval(pg_get_serial_sequence('questions', 'question_id'), coalesce(max(question_id)+1, 1), false) FROM questions;
+SELECT setval(pg_get_serial_sequence('answers', 'answer_id'), coalesce(max(answer_id)+1, 1), false) FROM answers;
+SELECT setval(pg_get_serial_sequence('photos', 'photo_id'), coalesce(max(photo_id)+1, 1), false) FROM photos;
