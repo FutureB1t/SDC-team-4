@@ -1,5 +1,7 @@
 config.js
 QA/
+database/
+package-lock.json
 
 # Logs
 logs
