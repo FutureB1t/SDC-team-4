@@ -43,9 +43,6 @@ const testTime = async (queryStr) => {
 
 // eslint-disable-next-line camelcase
 const fetchQandA = async (product_id, cb) => {
-  const testQ = (
-    `SELECT * FROM Questions WHERE product_id = ${product_id}`
-  );
   const queryQsStr = (
     `SELECT
       q.question_id,
@@ -77,7 +74,7 @@ const fetchQandA = async (product_id, cb) => {
     WHERE product_id = ${product_id}`);
   console.time('query response time');
   testTime(product_id);
-  await db.query(testQ, (err, res) => {
+  await db.query(queryQsStr, (err, res) => {
     if (err) {
       console.log(err);
     } else {
