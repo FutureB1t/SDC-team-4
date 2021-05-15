@@ -42,7 +42,6 @@ app.post(endPoints.addAnswer, (req, res) => {
   const question_id = req.params.id;
   const content = req.body.body;
   api.addAnswer(question_id, content, () => {
-    console.log('CONTENT: ' , content)
     res.status(204).send();
   });
 });

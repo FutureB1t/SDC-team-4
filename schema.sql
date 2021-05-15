@@ -83,7 +83,18 @@ ALTER TABLE Answers ADD FOREIGN KEY (question_id) REFERENCES Questions (question
 ALTER TABLE Photos ADD FOREIGN KEY (answer_id) REFERENCES Answers (answer_id);
 
 -- ---
--- Table Properties\l
+-- Indexes
+-- ---
+-- DROP INDEX IF EXISTS photo_id_index;
+-- DROP INDEX IF EXISTS answer_id_index;
+-- DROP INDEX IF EXISTS question_id_index;
+
+CREATE INDEX CONCURRENTLY photo_id_index ON photos USING HASH (photo_id);
+CREATE INDEX CONCURRENTLY answer_id_index ON answers USING HASH (answer_id);
+CREATE INDEX CONCURRENTLY question_id_index ON questions USING HASH (question_id);
+
+-- ---
+-- Table Properties
 -- ---
 
 -- ALTER TABLE Questions ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -96,14 +107,27 @@ ALTER TABLE Photos ADD FOREIGN KEY (answer_id) REFERENCES Answers (answer_id);
 -- ---
 
 INSERT INTO Product (product_id,name,slogan,description,category,default_price) VALUES
-(-420,'Dope Hoodie','Even doper now','simply the dopest','hoodies',3000);
+(1,'Dope Hoodie','Even doper now','simply the dopest','hoodies',3000);
 INSERT INTO Questions (product_id,question_id,body,date_written,asker_name,asker_email,reported,helpful) VALUES
-(-420,-1017,'question?',1599958385988,'seller','seller@email.com',0,3);
+(1,1,'question?',1599958385988,'seller','seller@email.com',0,3);
 INSERT INTO Answers (question_id,answer_id,body,date,answerer_name,answerer_email,reported,helpfulness) VALUES
-(-1017,-6969,'hey this is an answer',1599958385988,'johnnyB','jb@email.com',0,5);
+(1,1,'hey this is an answer',1599958385988,'johnnyB','jb@email.com',0,5);
 INSERT INTO Photos (answer_id,photo_id,url) VALUES
-(-6969,-1337,'radical_photo_url');
+(1,1,'radical_photo_url');
+
+-- ---
+-- INITIALIZE SERIALIZATION
+-- ---
 
 SELECT setval(pg_get_serial_sequence('questions', 'question_id'), coalesce(max(question_id)+1, 1), false) FROM questions;
 SELECT setval(pg_get_serial_sequence('answers', 'answer_id'), coalesce(max(answer_id)+1, 1), false) FROM answers;
 SELECT setval(pg_get_serial_sequence('photos', 'photo_id'), coalesce(max(photo_id)+1, 1), false) FROM photos;
+
+-- ---
+-- SEED DATA
+-- ---
+
+COPY product FROM '/Users/curtiscastro/work/Projects/SDC-team-4/QA/product.csv' DELIMITER ',' CSV HEADER;
+COPY questions FROM '/Users/curtiscastro/work/Projects/SDC-team-4/QA/questions.csv' DELIMITER ',' CSV HEADER;
+COPY answers FROM '/Users/curtiscastro/work/Projects/SDC-team-4/QA/answers.csv' DELIMITER ',' CSV HEADER;
+COPY photos FROM '/Users/curtiscastro/work/Projects/SDC-team-4/QA/answers_photos.csv' DELIMITER ',' CSV HEADER;

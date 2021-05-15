@@ -31,8 +31,21 @@ const fetchProduct = (id, cb) => {
   });
 };
 
+const testTime = async (queryStr) => {
+  await db.query(queryStr, (err, res) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(res);
+    }
+  });
+};
+
 // eslint-disable-next-line camelcase
 const fetchQandA = async (product_id, cb) => {
+  const testQ = (
+    `SELECT * FROM Questions WHERE product_id = ${product_id}`
+  );
   const queryQsStr = (
     `SELECT
       q.question_id,
@@ -62,15 +75,19 @@ const fetchQandA = async (product_id, cb) => {
       } AS answers
     FROM questions q
     WHERE product_id = ${product_id}`);
-  await db.query(queryQsStr, (err, res) => {
+  console.time('query response time');
+  testTime(product_id);
+  await db.query(testQ, (err, res) => {
     if (err) {
       console.log(err);
     } else {
+      console.timeEnd('query response time');
       const questionsArr = res.rows.map((row) => {
-        for (let key in row.answers) {
+        const transformed = Object.keys(row.answers).map((key) => {
           row.answers[key].photos = row.answers[key].photos.map((photo) => (photo.url));
           row.answers[key].date = moment.unix(parseInt(row.answers[key].date));
-        }
+          return row.answers[key];
+        });
         return {
           question_id: row.question_id,
           question_body: row.question_body,
@@ -146,11 +163,12 @@ const addAnswer = async (question_id, content, cb) => {
     ON CONFLICT ON CONSTRAINT answers_pkey
     DO NOTHING;
   `;
+  console.time('add answer query time');
   await db.query(queryStr, (err) => {
     if (err) {
       console.error(err);
     } else {
-      console.log('QUERY: ',queryStr);
+      console.timeEnd('add answer query time');
       cb();
     }
   });
@@ -158,8 +176,8 @@ const addAnswer = async (question_id, content, cb) => {
 
 const upvoteQuestions = async (question_id, cb) => {
   const queryStr = `
-    UPDATE questions
-    SET helpful = helpful + 1
+  UPDATE questions
+  SET helpful = helpful + 1
     WHERE question_id = ${question_id}
   `;
   await db.query(queryStr, (err) => {
