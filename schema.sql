@@ -92,6 +92,7 @@ ALTER TABLE Photos ADD FOREIGN KEY (answer_id) REFERENCES Answers (answer_id);
 CREATE INDEX CONCURRENTLY photo_id_index ON photos USING HASH (photo_id);
 CREATE INDEX CONCURRENTLY answer_id_index ON answers USING HASH (answer_id);
 CREATE INDEX CONCURRENTLY question_id_index ON questions USING HASH (question_id);
+CREATE INDEX CONCURRENTLY product_id_index ON product USING HASH (product_id);
 
 -- ---
 -- Table Properties
@@ -127,7 +128,8 @@ SELECT setval(pg_get_serial_sequence('photos', 'photo_id'), coalesce(max(photo_i
 -- SEED DATA
 -- ---
 
-COPY product FROM '/Users/curtiscastro/work/Projects/SDC-team-4/QA/product.csv' DELIMITER ',' CSV HEADER;
-COPY questions FROM '/Users/curtiscastro/work/Projects/SDC-team-4/QA/questions.csv' DELIMITER ',' CSV HEADER;
-COPY answers FROM '/Users/curtiscastro/work/Projects/SDC-team-4/QA/answers.csv' DELIMITER ',' CSV HEADER;
-COPY photos FROM '/Users/curtiscastro/work/Projects/SDC-team-4/QA/answers_photos.csv' DELIMITER ',' CSV HEADER;
+
+-- COPY product FROM '/Users/curtiscastro/Projects/InProgress/SDC-team-4/QA/product.csv' DELIMITER ',' CSV HEADER;
+-- COPY questions FROM '/Users/curtiscastro/Projects/InProgress/SDC-team-4/QA/questions.csv' DELIMITER ',' CSV HEADER;
+-- COPY answers FROM '/Users/curtiscastro/Projects/InProgress/SDC-team-4/QA/answers.csv' DELIMITER ',' CSV HEADER;
+-- COPY photos FROM '/Users/curtiscastro/Projects/InProgress/SDC-team-4/QA/answers_photos.csv' DELIMITER ',' CSV HEADER;

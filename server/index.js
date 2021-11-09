@@ -5,6 +5,10 @@ const app = express();
 const port = 8080;
 
 app.use(express.json());
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
 app.use(express.static(`${__dirname}/../client/dist`));
 
 const endPoints = {

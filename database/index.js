@@ -1,12 +1,25 @@
-const { Client } = require('pg');
+const { Client, Pool } = require('pg');
 
-const client = new Client({
+// const client = new Client({
+//   user: 'curtiscastro',
+//   host: 'localhost',
+//   database: 'superb_api',
+//   password: '',
+//   port: 5432,
+// });
+// client.connect();
+
+const pool = new Pool({
   user: 'curtiscastro',
   host: 'localhost',
   database: 'superb_api',
   password: '',
   port: 5432,
 });
-client.connect();
+pool.connect();
 
-module.exports = client;
+// module.exports = {
+//   client,
+//   pool,
+// };
+module.exports = pool;

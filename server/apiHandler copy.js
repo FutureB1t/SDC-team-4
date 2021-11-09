@@ -73,7 +73,6 @@ const fetchQs = async (product_id, cb) => {
     }
   });
 };
-
 const fetchAs = async (question_id, cb) => {
   const queryStr = queries.as + question_id.toString();
   await db.query(queryStr, (err, data) => {
@@ -95,53 +94,66 @@ const fetchPics = async (answer_id, cb) => {
   });
 };
 
+// const fetchQandA = async (product_id, cb) => {
+//   const query = queries.queryQs + product_id.toString();
+//   await db.query(query, (err, data) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       console.log('SENDING DATA');
+//       cb(data.rows);
+//     }
+//   });
+// };
+// eslint-disable-next-line camelcase
 const fetchQandA = async (product_id, cb) => {
-  const query = `Select *
-    from questions
-    left join answers on questions.question_id = answers.question_id
-    left join photos on answers.answer_id = photos.answer_id
-    where questions.product_id = ${product_id}
-    order by questions.question_id;`;
-  await db.query(query, (err, data) => {
-    let result = {};
-    const dbRows = data.rows;
-    let container = {
-      questions: {},
-      answers: {},
-      photos: {},
-    };
-    dbRows.forEach((r) => {
-      if (!container.questions[r.question_id] && r.question_id) {
-        container.questions[r.question_id] = r.body;
-      } else if (!container.answers[r.answer_id] && r.answer_id) {
-        container.answers[r.answer_id] = r.answer_id;
-      } else if (!container.photos[r.photo_id] && r.photo_id) {
-        container.photos[r.photo_id] = r.photo_id;
-      } else {
-        console.log(r);
-      }
-      // console.log(r);
-      // const res = {};
-      // res.question_id = r.question_id;
-      // res.product_id = r.product_id;
-      // res.body = r.body;
-      // res.date_written = r.date_written;
-      // res.asker_name = r.asker_name;
-      // res.asker_email = r.asker_email;
-      // res.reported = r.reported;
-      // res.helpful = r.helpful;
-      // res.answers = [];
-      // container.questions[r.question_id] = res;
+
+
+  const result = {curtis: 5};
+
+  const Qs = await fetchQs(product_id, (data) => {
+    let questionsCont = {};
+    const questions = data.rows;
+    questions.forEach((q) => {
+      const res = {};
+      res.question_id = q.question_id;
+      res.product_id = q.product_id;
+      res.body = q.body;
+      res.date_written = q.date_written;
+      res.asker_name = q.asker_name;
+      res.asker_email = q.asker_email;
+      res.reported = q.reported;
+      res.helpful = q.helpful;
+      res.answers = [];
+      questionsCont[q.question_id] = res;
     });
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('SENDING DATA', container);
-      cb(container);
-    }
-  });
+    result.questions = questionsCont;
+    console.log('questions',questionsCont);
+  })
+  .catch((err) => console.log('ERROR:', err));
+
 };
 
+// const answers = Object.values(questions).map(async (q) => {
+//   await fetchAs(q.question_id, (data) => {
+//     const answersCont = [];
+//     const answerArr = data.rows;
+//     answerArr.forEach((a) => {
+//       const res = {};
+//       res.answer_id = a.answer_id;
+//       res.product_id = a.product_id;
+//       res.body = a.body;
+//       res.date_written = a.date_written;
+//       res.answerer_name = a.answerer_name;
+//       res.answerer_email = a.answerer_email;
+//       res.reported = a.reported;
+//       res.helpful = a.helpful;
+//       res.photos = [];
+//       answersCont.push(res);
+//     });
+//     return answersCont;
+//   }).then(() => {console.log('answers fetched')}).catch((err) => console.log(err));
+// });
 const fetchAsForQ = async (question_id, cb) => {
   const queryStr = `SELECT
       a.answer_id,
