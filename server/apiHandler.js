@@ -1,59 +1,4 @@
-/* eslint-disable no-console */
-/* eslint-disable prefer-const */
-/* eslint-disable camelcase */
-const moment = require('moment');
-const app = require('axios');
 const db = require('../database');
-
-
-const fetchProduct = (id, cb) => {
-  const queryStr = `SELECT * FROM product WHERE id = ${id}`;
-  db.query(queryStr, (err, res) => {
-    if (err) {
-      console.log(err);
-    } else {
-      cb(res.rows);
-    }
-  });
-};
-
-const queries = {
-  as: 'SELECT * FROM answers WHERE question_id = ',
-  pics: 'SELECT * FROM photos WHERE answer_id = ',
-};
-
-const fetchQs = async (product_id, cb) => {
-  const queryStr =
-    'SELECT * FROM questions WHERE product_id = ' + product_id.toString();
-  await db.query(queryStr, (err, data) => {
-    if (err) {
-      console.log('ERROR: ', err);
-    } else {
-      cb(data);
-    }
-  });
-};
-
-const fetchAs = async (question_id, cb) => {
-  const queryStr = queries.as + question_id.toString();
-  await db.query(queryStr, (err, data) => {
-    if (err) {
-      console.log('ERROR: ', err);
-    } else {
-      cb(data);
-    }
-  });
-};
-const fetchPics = async (answer_id, cb) => {
-  const queryStr = queries.pics + answer_id.toString();
-  await db.query(queryStr, (err, data) => {
-    if (err) {
-      console.log('ERROR: ', err);
-    } else {
-      cb(data);
-    }
-  });
-};
 
 const fetchQandA = async (product_id, cb) => {
   const queryStr = `Select
@@ -315,6 +260,54 @@ const reportQuestion = async (question_id, cb) => {
     }
   });
 };
+
+///////////////////////////////////////////////////
+
+const fetchProduct = (id, cb) => {
+  const queryStr = `SELECT * FROM product WHERE id = ${id}`;
+  db.query(queryStr, (err, res) => {
+    if (err) {
+      console.log(err);
+    } else {
+      cb(res.rows);
+    }
+  });
+};
+
+const fetchQs = async (product_id, cb) => {
+  const queryStr =
+    'SELECT * FROM questions WHERE product_id = ' + product_id.toString();
+  await db.query(queryStr, (err, data) => {
+    if (err) {
+      console.log('ERROR: ', err);
+    } else {
+      cb(data);
+    }
+  });
+};
+
+const fetchAs = async (question_id, cb) => {
+  const queryStr = 'SELECT * FROM answers WHERE question_id = ' + question_id.toString();
+  await db.query(queryStr, (err, data) => {
+    if (err) {
+      console.log('ERROR: ', err);
+    } else {
+      cb(data);
+    }
+  });
+};
+const fetchPics = async (answer_id, cb) => {
+  const queryStr = 'SELECT * FROM photos WHERE answer_id = ' + answer_id.toString();
+  await db.query(queryStr, (err, data) => {
+    if (err) {
+      console.log('ERROR: ', err);
+    } else {
+      cb(data);
+    }
+  });
+};
+
+//////////////////////////////////////////////////
 
 module.exports = {
   fetchProduct,
