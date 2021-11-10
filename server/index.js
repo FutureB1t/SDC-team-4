@@ -37,6 +37,7 @@ app.get(endPoints.fetchAsForQ, (req, res) => {
 
 app.post(endPoints.addQuestion, (req, res) => {
   const content = req.body;
+  console.log(content);
   api.addQuestion(content, () => {
     res.status(204).send();
   });
@@ -44,7 +45,7 @@ app.post(endPoints.addQuestion, (req, res) => {
 
 app.post(endPoints.addAnswer, (req, res) => {
   const question_id = req.params.id;
-  const content = req.body.body;
+  const content = req.body;
   api.addAnswer(question_id, content, () => {
     res.status(204).send();
   });

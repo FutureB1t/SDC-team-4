@@ -124,6 +124,8 @@ SELECT setval(pg_get_serial_sequence('questions', 'question_id'), coalesce(max(q
 SELECT setval(pg_get_serial_sequence('answers', 'answer_id'), coalesce(max(answer_id)+1, 1), false) FROM answers;
 SELECT setval(pg_get_serial_sequence('photos', 'photo_id'), coalesce(max(photo_id)+1, 1), false) FROM photos;
 
+-- SELECT setval(pg_get_serial_sequence('answers', 'answer_id'), (SELECT MAX(answer_id) FROM answers)+1);
+
 -- ---
 -- SEED DATA
 -- ---

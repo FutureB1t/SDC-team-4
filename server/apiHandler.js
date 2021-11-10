@@ -186,6 +186,7 @@ const addQuestion = async (content, cb) => {
     INSERT INTO questions(product_id, body, asker_name, asker_email)
     VALUES(${product_id},'${body}','${name}','${email}');
   `;
+  console.log('CONTENT: ', content);
   console.log('QUERY: ', queryStr);
   await db.query(queryStr, (err) => {
     if (err) {
@@ -196,25 +197,47 @@ const addQuestion = async (content, cb) => {
     }
   });
 };
-
-const addAnswer = async (question_id, content, cb) => {
-  let { body, name, email } = content;
+const addAnswer = async (id, content, cb) => {
+  console.log('CONTENT: ', content);
+  const date = new Date().getTime();
+  const {
+    body,
+    answerer_name,
+    answerer_email,
+  } = content;
   const queryStr = `
-    INSERT INTO answers(question_id, body, answerer_name, answerer_email)
-    VALUES(${question_id},'${body}','${name}','${email}')
-    ON CONFLICT ON CONSTRAINT answers_pkey
-    DO NOTHING;
+    INSERT INTO answers(question_id, date, body, answerer_name, answerer_email)
+    VALUES('${id}','${date}','${body}','${answerer_name}','${answerer_email}');
   `;
-  // console.time('add answer query time');
   await db.query(queryStr, (err) => {
+    console.log('QUERY: ', queryStr);
     if (err) {
-      console.error(err);
+      console.log(err);
     } else {
-      // console.timeEnd('add answer query time');
+      console.log('Adding Answer');
       cb();
     }
   });
 };
+
+// const addAnswer = async (question_id, content, cb) => {
+//   let { body, name, email } = content;
+//   const queryStr = `
+//     INSERT INTO answers(question_id, body, answerer_name, answerer_email)
+//     VALUES(${question_id},'${body}','${name}','${email}')
+//     ON CONFLICT ON CONSTRAINT answers_pkey
+//     DO NOTHING;
+//   `;
+//   // console.time('add answer query time');
+//   await db.query(queryStr, (err) => {
+//     if (err) {
+//       console.error(err);
+//     } else {
+//       // console.timeEnd('add answer query time');
+//       cb();
+//     }
+//   });
+// };
 
 const upvoteQuestions = async (question_id, cb) => {
   const queryStr = `
