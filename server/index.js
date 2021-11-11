@@ -12,25 +12,31 @@ app.use((req, res, next) => {
 app.use(express.static(`${__dirname}/../client/dist`));
 
 const endPoints = {
-  fetchQandA: '/qa/questions/product_id=:id',
-  fetchAsForQ: '/qa/questions/:id/answers',
+  fetchAllQA: '/qa/questions/product_id=:id',
+  fetchQuestionAnswers: '/qa/questions/:id/answers',
   addQuestion: '/qa/questions',
   addAnswer: '/qa/questions/:id/answers',
   upvoteQuestions: '/qa/questions/:id/helpful',
   upvoteAnswers: '/qa/answers/:id/helpful',
   reportQuestion: '/qa/questions/:id/report',
 };
+const testEndPoints = {
+  fetchProduct: '/product/product_id=:id',
+  fetchQuestions: '/questions/product_id=:id',
+  fetchAnswers: '/answers/question_id=:id',
+  fetchPics: '/photos/answer_id=:id',
+};
 
-app.get(endPoints.fetchQandA, (req, res) => {
+app.get(endPoints.fetchAllQA, (req, res) => {
   const { id } = req.params;
-  api.fetchQandA(id, (data) => {
+  api.fetchAllQA(id, (data) => {
     res.status(200).send(data);
   });
 });
 
-app.get(endPoints.fetchAsForQ, (req, res) => {
+app.get(endPoints.fetchQuestionAnswers, (req, res) => {
   const { id } = req.params;
-  api.fetchAsForQ(id, (data) => {
+  api.fetchQuestionAnswers(id, (data) => {
     res.status(200).send(data);
   });
 });
@@ -72,6 +78,32 @@ app.put(endPoints.reportQuestion, (req, res) => {
       console.log(err);
     }
     res.status(204).send();
+  });
+});
+
+app.get(testEndPoints.fetchProduct, (req, res) => {
+  const product_id = req.params.id;
+  api.fetchProduct(product_id, (data) => {
+    res.status(200).send(data.rows);
+  });
+});
+app.get(testEndPoints.fetchQuestions, (req, res) => {
+  const product_id = req.params.id;
+  api.fetchQuestions(product_id, (data) => {
+    res.status(200).send(data.rows);
+  });
+});
+app.get(testEndPoints.fetchAnswers, (req, res) => {
+  const question_id = req.params.id;
+  api.fetchAnswers(question_id, (data) => {
+    console.log(question_id);
+    res.status(200).send(data.rows);
+  });
+});
+app.get(testEndPoints.fetchPics, (req, res) => {
+  const answer_id = req.params.id;
+  api.fetchPics(answer_id, (data) => {
+    res.status(200).send(data.rows);
   });
 });
 

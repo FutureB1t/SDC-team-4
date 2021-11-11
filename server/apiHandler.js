@@ -1,6 +1,6 @@
 const db = require('../database');
 
-const fetchQandA = async (product_id, cb) => {
+const fetchAllQA = async (product_id, cb) => {
   const queryStr = `Select
       questions.question_id,
       questions.product_id,
@@ -99,13 +99,12 @@ const fetchQandA = async (product_id, cb) => {
     if (err) {
       console.log(err);
     } else {
-      console.log('SENDING DATA');
       cb(questions);
     }
   });
 };
 
-const fetchAsForQ = async (question_id, cb) => {
+const fetchQuestionAnswers = async (question_id, cb) => {
   const queryStr = `Select
       answers.answer_id,
       answers.date as answer_date,
@@ -186,8 +185,6 @@ const addQuestion = async (content, cb) => {
     INSERT INTO questions(product_id, body, asker_name, asker_email)
     VALUES(${product_id},'${body}','${name}','${email}');
   `;
-  console.log('CONTENT: ', content);
-  console.log('QUERY: ', queryStr);
   await db.query(queryStr, (err) => {
     if (err) {
       console.log(err);
@@ -198,7 +195,6 @@ const addQuestion = async (content, cb) => {
   });
 };
 const addAnswer = async (id, content, cb) => {
-  console.log('CONTENT: ', content);
   const date = new Date().getTime();
   const {
     body,
@@ -210,7 +206,6 @@ const addAnswer = async (id, content, cb) => {
     VALUES('${id}','${date}','${body}','${answerer_name}','${answerer_email}');
   `;
   await db.query(queryStr, (err) => {
-    console.log('QUERY: ', queryStr);
     if (err) {
       console.log(err);
     } else {
@@ -220,25 +215,6 @@ const addAnswer = async (id, content, cb) => {
   });
 };
 
-// const addAnswer = async (question_id, content, cb) => {
-//   let { body, name, email } = content;
-//   const queryStr = `
-//     INSERT INTO answers(question_id, body, answerer_name, answerer_email)
-//     VALUES(${question_id},'${body}','${name}','${email}')
-//     ON CONFLICT ON CONSTRAINT answers_pkey
-//     DO NOTHING;
-//   `;
-//   // console.time('add answer query time');
-//   await db.query(queryStr, (err) => {
-//     if (err) {
-//       console.error(err);
-//     } else {
-//       // console.timeEnd('add answer query time');
-//       cb();
-//     }
-//   });
-// };
-
 const upvoteQuestions = async (question_id, cb) => {
   const queryStr = `
   UPDATE questions
@@ -246,6 +222,7 @@ const upvoteQuestions = async (question_id, cb) => {
     WHERE question_id = ${question_id}
   `;
   await db.query(queryStr, (err) => {
+    console.log('QUERY: ', queryStr);
     if (err) {
       console.error(err);
     } else {
@@ -286,44 +263,45 @@ const reportQuestion = async (question_id, cb) => {
 
 ///////////////////////////////////////////////////
 
-const fetchProduct = (id, cb) => {
-  const queryStr = `SELECT * FROM product WHERE id = ${id}`;
-  db.query(queryStr, (err, res) => {
+const fetchProduct = (product_id, cb) => {
+  const queryStr = `SELECT * FROM product WHERE product_id= ${product_id}`;
+  db.query(queryStr, (err, data) => {
     if (err) {
       console.log(err);
-    } else {
-      cb(res.rows);
-    }
-  });
-};
-
-const fetchQs = async (product_id, cb) => {
-  const queryStr =
-    'SELECT * FROM questions WHERE product_id = ' + product_id.toString();
-  await db.query(queryStr, (err, data) => {
-    if (err) {
-      console.log('ERROR: ', err);
     } else {
       cb(data);
     }
   });
 };
 
-const fetchAs = async (question_id, cb) => {
-  const queryStr = 'SELECT * FROM answers WHERE question_id = ' + question_id.toString();
+const fetchQuestions = async (product_id, cb) => {
+  const queryStr = `SELECT * FROM questions WHERE product_id= ${product_id}`;
   await db.query(queryStr, (err, data) => {
     if (err) {
-      console.log('ERROR: ', err);
+      alert('ERROR: ', err);
     } else {
+      cb(data);
+    }
+  });
+};
+
+const fetchAnswers = async (question_id, cb) => {
+  const queryStr = `SELECT * FROM answers WHERE question_id= ${question_id};`;
+  await db.query(queryStr, (err, data) => {
+    console.log('QUERY', queryStr);
+    if (err) {
+      alert('ERROR: ', err);
+    } else {
+      console.log(data);
       cb(data);
     }
   });
 };
 const fetchPics = async (answer_id, cb) => {
-  const queryStr = 'SELECT * FROM photos WHERE answer_id = ' + answer_id.toString();
+  const queryStr = `SELECT * FROM photos WHERE answer_id= ${answer_id};`;
   await db.query(queryStr, (err, data) => {
     if (err) {
-      console.log('ERROR: ', err);
+      alert('ERROR: ', err);
     } else {
       cb(data);
     }
@@ -333,15 +311,15 @@ const fetchPics = async (answer_id, cb) => {
 //////////////////////////////////////////////////
 
 module.exports = {
-  fetchProduct,
-  fetchQs,
-  fetchAs,
-  fetchPics,
-  fetchQandA,
-  fetchAsForQ,
+  fetchAllQA,
+  fetchQuestionAnswers,
   addQuestion,
   addAnswer,
   upvoteQuestions,
   upvoteAnswers,
   reportQuestion,
+  fetchProduct,
+  fetchQuestions,
+  fetchAnswers,
+  fetchPics,
 };
