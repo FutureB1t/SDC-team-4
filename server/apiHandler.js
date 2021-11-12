@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 const db = require('../database');
 
 const fetchAllQA = async (product_id, cb) => {
@@ -28,12 +29,12 @@ const fetchAllQA = async (product_id, cb) => {
     order by questions.question_id;`;
   await db.query(queryStr, (err, data) => {
     const dbRows = data.rows;
-    let container = {
+    const container = {
       questions: {},
       answers: {},
       photos: {},
     };
-    let {
+    const {
       questions, answers, photos,
     } = container;
     dbRows.forEach((r) => {
@@ -77,29 +78,39 @@ const fetchAllQA = async (product_id, cb) => {
           photo_id,
         },
       };
-      if (question_body && answer_body && url) {
-        questions[question_id] = models.questionModel;
-        answers[answer_id] = models.answerModel;
-        photos[answer_id] = models.photoModel;
+      const tests = {
+        Photo: (question_body && answer_body && url),
+        Answer: (question_body && answer_body && !url),
+        Question: (question_body && !answer_body && !url),
       }
-      if (question_body && answer_body && !url) {
-        questions[question_id] = models.questionModel;
-        answers[answer_id] = models.answerModel;
+      const { questionModel, answerModel, photoModel } = models;
+      const { Question, Answer, Photo } = tests;
+      if (Photo) {
+        questions[question_id] = questionModel;
+        answers[answer_id] = answerModel;
+        photos[answer_id] = photoModel;
       }
-      if (question_body && !answer_body && !url) {
-        questions[question_id] = models.questionModel;
+      if (Answer) {
+        questions[question_id] = questionModel;
+        answers[answer_id] = answerModel;
+      }
+      if (Question) {
+        questions[question_id] = questionModel;
       }
     });
+    // Populate Answers with corresponding photo urls
     Object.keys(photos).forEach((k) => {
       answers[k].photos.push({ url: `${photos[k].url}` });
     });
+    // Populate Questions with corresponding answers
     Object.values(answers).forEach((v) => {
       questions[v.question_id].answers[v.id] = v;
     });
+    const result = questions;
     if (err) {
-      console.log(err);
+      throw new Error('BROKEN: ', err);
     } else {
-      cb(questions);
+      cb(result);
     }
   });
 };
@@ -121,11 +132,11 @@ const fetchQuestionAnswers = async (question_id, cb) => {
     order by answers.question_id;`;
   await db.query(queryStr, (err, data) => {
     const dbRows = data.rows;
-    let container = {
+    const container = {
       answers: {},
       photos: {},
     };
-    let {
+    const {
       answers, photos,
     } = container;
     dbRows.forEach((r) => {
@@ -139,7 +150,7 @@ const fetchQuestionAnswers = async (question_id, cb) => {
         url,
       } = r;
       const models = {
-        answerModel: {
+        answer: {
           id: answer_id,
           body: answer_body,
           date: answer_date,
@@ -148,34 +159,33 @@ const fetchQuestionAnswers = async (question_id, cb) => {
           answerer_name,
           question_id,
         },
-        photoModel: {
+        photo: {
           url,
           answer_id,
           photo_id,
         },
       };
       if (answer_body && url) {
-        answers[answer_id] = models.answerModel;
-        photos[answer_id] = models.photoModel;
+        answers[answer_id] = models.answer;
+        photos[answer_id] = models.photo;
       }
       if (answer_body && !url) {
-        answers[answer_id] = models.answerModel;
+        answers[answer_id] = models.answer;
       }
     });
     Object.keys(photos).forEach((k) => {
       answers[k].photos.push({ url: `${photos[k].url}` });
     });
     if (err) {
-      console.log(err);
+      throw new Error('BROKEN: ', err);
     } else {
-      console.log('SENDING DATA', answers);
       cb(answers);
     }
   });
 };
 
 const addQuestion = async (content, cb) => {
-  let {
+  const {
     product_id,
     body,
     name,
@@ -187,9 +197,8 @@ const addQuestion = async (content, cb) => {
   `;
   await db.query(queryStr, (err) => {
     if (err) {
-      console.log(err);
+      throw new Error('BROKEN: ', err);
     } else {
-      console.log('Adding Answer');
       cb();
     }
   });
@@ -207,9 +216,8 @@ const addAnswer = async (id, content, cb) => {
   `;
   await db.query(queryStr, (err) => {
     if (err) {
-      console.log(err);
+      throw new Error('BROKEN: ', err);
     } else {
-      console.log('Adding Answer');
       cb();
     }
   });
@@ -222,9 +230,8 @@ const upvoteQuestions = async (question_id, cb) => {
     WHERE question_id = ${question_id}
   `;
   await db.query(queryStr, (err) => {
-    console.log('QUERY: ', queryStr);
     if (err) {
-      console.error(err);
+      throw new Error('BROKEN: ', err);
     } else {
       cb();
     }
@@ -239,7 +246,7 @@ const upvoteAnswers = async (answer_id, cb) => {
   `;
   await db.query(queryStr, (err) => {
     if (err) {
-      console.error(err);
+      throw new Error('BROKEN: ', err);
     } else {
       cb();
     }
@@ -254,20 +261,22 @@ const reportQuestion = async (question_id, cb) => {
   `;
   await db.query(queryStr, (err) => {
     if (err) {
-      console.error(err);
+      throw new Error('BROKEN: ', err);
     } else {
       cb();
     }
   });
 };
 
-///////////////////////////////////////////////////
+/*
+>>>>>>>>>>>>>>>>>START<<<<<<<<<<<<<<<<<<<<<<<
+*/
 
 const fetchProduct = (product_id, cb) => {
   const queryStr = `SELECT * FROM product WHERE product_id= ${product_id}`;
   db.query(queryStr, (err, data) => {
     if (err) {
-      console.log(err);
+      throw new Error('BROKEN: ', err);
     } else {
       cb(data);
     }
@@ -278,7 +287,7 @@ const fetchQuestions = async (product_id, cb) => {
   const queryStr = `SELECT * FROM questions WHERE product_id= ${product_id}`;
   await db.query(queryStr, (err, data) => {
     if (err) {
-      alert('ERROR: ', err);
+      throw new Error('BROKEN: ', err);
     } else {
       cb(data);
     }
@@ -288,11 +297,9 @@ const fetchQuestions = async (product_id, cb) => {
 const fetchAnswers = async (question_id, cb) => {
   const queryStr = `SELECT * FROM answers WHERE question_id= ${question_id};`;
   await db.query(queryStr, (err, data) => {
-    console.log('QUERY', queryStr);
     if (err) {
-      alert('ERROR: ', err);
+      throw new Error('BROKEN: ', err);
     } else {
-      console.log(data);
       cb(data);
     }
   });
@@ -301,14 +308,16 @@ const fetchPics = async (answer_id, cb) => {
   const queryStr = `SELECT * FROM photos WHERE answer_id= ${answer_id};`;
   await db.query(queryStr, (err, data) => {
     if (err) {
-      alert('ERROR: ', err);
+      throw new Error('BROKEN: ', err);
     } else {
       cb(data);
     }
   });
 };
 
-//////////////////////////////////////////////////
+/*
+>>>>>>>>>>>>>>>>>END<<<<<<<<<<<<<<<<<<<<<<<
+*/
 
 module.exports = {
   fetchAllQA,
