@@ -3,7 +3,7 @@ const express = require('express');
 const api = require('./apiHandler');
 
 const app = express();
-const port = 8080;
+const port = 7789;
 
 app.use(express.json());
 app.use((req, res, next) => {

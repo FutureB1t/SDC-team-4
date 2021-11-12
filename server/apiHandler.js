@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 const db = require('../database');
 
+
 const fetchAllQA = async (product_id, cb) => {
   const queryStr = `Select
       questions.question_id,
