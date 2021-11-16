@@ -5,7 +5,12 @@ const api = require('./apiHandler');
 const app = express();
 const port = 7789;
 
+// var bodyParser = require('body-parser');
+// app.use(bodyParser.json()); // support json encoded bodies
+// app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   next();
@@ -52,6 +57,7 @@ app.post(endPoints.addQuestion, (req, res) => {
 app.post(endPoints.addAnswer, (req, res) => {
   const question_id = req.params.id;
   const content = req.body;
+  console.log(content);
   api.addAnswer(question_id, content, () => {
     res.status(204).send();
   });

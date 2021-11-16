@@ -204,16 +204,17 @@ const addQuestion = async (content, cb) => {
     }
   });
 };
+
 const addAnswer = async (id, content, cb) => {
   const date = new Date().getTime();
   const {
     body,
-    answerer_name,
-    answerer_email,
+    name,
+    email,
   } = content;
   const queryStr = `
     INSERT INTO answers(question_id, date, body, answerer_name, answerer_email)
-    VALUES('${id}','${date}','${body}','${answerer_name}','${answerer_email}');
+    VALUES('${id}','${date}','${body}','${name}','${email}');
   `;
   await db.query(queryStr, (err) => {
     if (err) {
@@ -274,7 +275,7 @@ const reportQuestion = async (question_id, cb) => {
 */
 
 const fetchProduct = (product_id, cb) => {
-  const queryStr = `SELECT * FROM product WHERE product_id= ${product_id}`;
+  const queryStr = `SELECT * FROM product WHERE product_id=${product_id}`;
   db.query(queryStr, (err, data) => {
     if (err) {
       throw new Error('BROKEN: ', err);
@@ -285,7 +286,7 @@ const fetchProduct = (product_id, cb) => {
 };
 
 const fetchQuestions = async (product_id, cb) => {
-  const queryStr = `SELECT * FROM questions WHERE product_id= ${product_id}`;
+  const queryStr = `SELECT * FROM questions WHERE product_id=${product_id}`;
   await db.query(queryStr, (err, data) => {
     if (err) {
       throw new Error('BROKEN: ', err);
@@ -296,7 +297,7 @@ const fetchQuestions = async (product_id, cb) => {
 };
 
 const fetchAnswers = async (question_id, cb) => {
-  const queryStr = `SELECT * FROM answers WHERE question_id= ${question_id};`;
+  const queryStr = `SELECT * FROM answers WHERE question_id=${question_id};`;
   await db.query(queryStr, (err, data) => {
     if (err) {
       throw new Error('BROKEN: ', err);
@@ -306,7 +307,7 @@ const fetchAnswers = async (question_id, cb) => {
   });
 };
 const fetchPics = async (answer_id, cb) => {
-  const queryStr = `SELECT * FROM photos WHERE answer_id= ${answer_id};`;
+  const queryStr = `SELECT * FROM photos WHERE answer_id=${answer_id};`;
   await db.query(queryStr, (err, data) => {
     if (err) {
       throw new Error('BROKEN: ', err);
